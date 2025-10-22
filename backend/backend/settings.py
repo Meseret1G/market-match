@@ -107,10 +107,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'Market_macher',
-        'USER': 'postgres',
-        'PASSWORD': 'meseret369',
-        'HOST': 'localhost',  
-        'PORT': '5432',        
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',  
+        'PORT': '',        
     }
 }
 
