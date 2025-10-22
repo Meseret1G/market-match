@@ -5,8 +5,8 @@ services:
     image: postgres:15
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: meseret369
+      POSTGRES_USER: 
+      POSTGRES_PASSWORD: 
       POSTGRES_DB: marketplace
     ports:
       - "5432:5432"
