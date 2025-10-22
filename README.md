@@ -1,4 +1,4 @@
-Market Match
+## Market Match
 
 Market Match is a full-stack web application that connects service providers with customers.  
 Providers can create service listings, manage availability, and handle bookings — while customers can browse services and book in real time.
