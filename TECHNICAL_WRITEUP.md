@@ -1,4 +1,4 @@
-# AI-Powered Skill Matching Platform - Technical Write-up (Production)
+# AI-Powered Skill Matching Platform - Technical Write-up 
 
 ## System Architecture
 The platform is built using a modern decoupled architecture:
