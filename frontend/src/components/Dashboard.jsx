@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api'
-import { ChatIcon, TalentIcon } from './Icons'
+import { ChatIcon, TalentIcon, SearchIcon } from './Icons'
 
 export default function Dashboard() {
   const [matches, setMatches] = useState([])
