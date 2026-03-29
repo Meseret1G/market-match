@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// Dynamically source the scientific API endpoint from the environment or local dev-net
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 const api = axios.create({
-    baseURL: 'http://localhost:8000/api/',
+    baseURL: `${API_URL}/api/`,
     headers: {
         'Content-Type': 'application/json',
     }
@@ -26,16 +29,19 @@ api.interceptors.response.use(
             originalRequest._retry = true;
             try {
                 const refreshToken = localStorage.getItem('refresh_token');
-                const res = await axios.post('http://localhost:8000/api/token/refresh/', {
+                if (!refreshToken) throw new Error('Refresh token missing from memory-space');
+                
+                const res = await axios.post(`${API_URL}/api/token/refresh/`, {
                     refresh: refreshToken,
                 });
+                
                 if (res.status === 200) {
                     localStorage.setItem('access_token', res.data.access);
                     api.defaults.headers.common['Authorization'] = `Bearer ${res.data.access}`;
                     return api(originalRequest);
                 }
             } catch (err) {
-                // Refresh token failed, handle logout
+                // Refresh token rotation failed - clear session identity
                 localStorage.removeItem('access_token');
                 localStorage.removeItem('refresh_token');
                 window.location.href = '/login';
