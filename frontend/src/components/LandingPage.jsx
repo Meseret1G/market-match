@@ -8,6 +8,7 @@ export default function LandingPage() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('jobs')
   const [search, setSearch] = useState('')
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('access_token'))
 
   useEffect(() => {
     fetchData()
@@ -26,6 +27,14 @@ export default function LandingPage() {
       console.error(err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleAction = () => {
+    if (isLoggedIn) {
+      window.location.href = '/dashboard'
+    } else {
+      window.location.href = '/login'
     }
   }
 
@@ -91,7 +100,9 @@ export default function LandingPage() {
                   </div>
                   <div className="flex-between" style={{ borderTop: '1.5px solid #f1f5f9', paddingTop: '1.5rem' }}>
                     <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8' }}>AUTHORIZED CLIENT: @{job.client?.username}</span>
-                    <button className="btn btn-primary" style={{ fontSize: '0.8rem', padding: '0.55rem 1.25rem' }} onClick={() => window.location.href = '/login'}>Apply Now</button>
+                    <button className="btn btn-primary" style={{ fontSize: '0.8rem', padding: '0.55rem 1.25rem' }} onClick={handleAction}>
+                        {isLoggedIn ? 'Launch Identification' : 'Apply Now'}
+                    </button>
                   </div>
                 </div>
               ))
@@ -105,7 +116,9 @@ export default function LandingPage() {
                   <p style={{ color: 'var(--text-muted)', fontWeight: 700, fontSize: '0.8rem', marginBottom: '1.5rem', textTransform: 'uppercase' }}>{profile.experience_level} Tier Specialist</p>
                   <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Primary Arsenal: {profile.skills.slice(0, 50)}...</p>
                   <div style={{ fontWeight: 900, fontSize: '1.5rem', marginBottom: '2rem' }}>${profile.hourly_rate}<span style={{ fontSize: '0.8rem', opacity: 0.6 }}>/HOUR</span></div>
-                  <button className="btn btn-primary" style={{ width: '100%', borderRadius: '16px' }} onClick={() => window.location.href = '/login'}>Audit Profile</button>
+                  <button className="btn btn-primary" style={{ width: '100%', borderRadius: '16px' }} onClick={handleAction}>
+                      {isLoggedIn ? 'Access Identity' : 'Audit Profile'}
+                  </button>
                 </div>
               ))
             )}

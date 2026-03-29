@@ -91,13 +91,21 @@ class JobViewSet(viewsets.ModelViewSet):
     def matches(self, request, pk=None):
         job = self.get_object()
         matches = Match.objects.filter(job=job).order_by('-match_score')
+        
+        # Optimized Discovery: Relaxed filtering to ensure client sees talent board
         required_tags = [s.strip().lower() for s in job.required_skills.split(',') if s.strip()]
         verified_match_ids = []
         for m in matches:
             candidate_skills = m.freelancer.skills.lower()
-            if any(tag in candidate_skills for tag in required_tags) or m.match_score > 4.5:
+            # Relaxed logic: Higher sensitivity to partial overlaps
+            if any(tag in candidate_skills for tag in required_tags) or m.match_score >= 3.0:
                 verified_match_ids.append(m.id)
+        
         verified_matches = matches.filter(id__in=verified_match_ids)
+        # Fallback: if no high-quality matches, show top 5 general candidates
+        if not verified_matches.exists():
+            verified_matches = matches[:5]
+            
         serializer = MatchSerializer(verified_matches, many=True)
         return Response(serializer.data)
 

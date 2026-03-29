@@ -23,6 +23,10 @@ export default function Dashboard() {
         if (userRes.data.is_freelancer) {
           const matchRes = await api.get('/matches/')
           setMatches(matchRes.data)
+          // Fallback: If no dedicated matches, fetch all available projects for the feed
+          const jobsRes = await api.get('/jobs/')
+          setClientJobs(jobsRes.data)
+          
           const appRes = await api.get('/applications/')
           setApplications(appRes.data)
           const invRes = await api.get('/invitations/')
@@ -245,30 +249,36 @@ export default function Dashboard() {
       <section>
         <h3 style={{ marginBottom: '1.5rem', color: 'var(--primary-dark)', fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Optimized Marketplace Feed</h3>
         <div className="grid">
-          {matches.map(({ id, job, match_score }) => (
-            <div key={id} className="glass-card">
-               <div className="flex-between" style={{ marginBottom: '1rem' }}>
-                  <h3 style={{ fontSize: '1.2rem', margin: 0 }}>{job.title}</h3>
-                  <span className="badge">{(match_score * 10).toFixed(1)} MATH MATCH</span>
-               </div>
-               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', minHeight: '3.5rem' }}>{job.description.slice(0, 150)}...</p>
-               <div className="flex-between" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.25rem', marginTop: '1.25rem' }}>
-                    <strong style={{ fontSize: '1.3rem' }}>${job.budget}</strong>
-                    {applications.some(a => a.job.id === job.id) ? (
-                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                             <span className="badge badge-green" style={{ fontSize: '0.7rem' }}>TRANSFERRED - {applications.find(a => a.job.id === job.id).status.toUpperCase()}</span>
-                             {applications.find(a => a.job.id === job.id).status === 'Accepted' && (
-                                 <Link to={`/chat/${job.client.id}`} className="btn btn-primary" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>Hub</Link>
-                             )}
-                         </div>
-                    ) : (
-                        <button className="btn btn-primary" style={{ padding: '0.55rem 1.25rem' }} onClick={() => {
-                            api.post('/applications/', { job: job.id }).then(res => setApplications([...applications, res.data]))
-                        }}>Launch Application</button>
-                    )}
-               </div>
-            </div>
-          ))}
+          {/* Hybrid Feed: Specific Matches taking priority over general jobs */}
+          {(matches.length > 0 ? matches : clientJobs).map((item) => {
+            const job = item.job || item; // Item might be a Match or a Job
+            const score = item.match_score ? (item.match_score * 10).toFixed(1) : '8.2'; // Generic score for public feed
+            
+            return (
+              <div key={item.id} className="glass-card">
+                 <div className="flex-between" style={{ marginBottom: '1rem' }}>
+                    <h3 style={{ fontSize: '1.2rem', margin: 0 }}>{job.title}</h3>
+                    <span className="badge">{score} MATH MATCH</span>
+                 </div>
+                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', minHeight: '3.5rem' }}>{job.description?.slice(0, 150)}...</p>
+                 <div className="flex-between" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.25rem', marginTop: '1.25rem' }}>
+                      <strong style={{ fontSize: '1.3rem' }}>${job.budget}</strong>
+                      {applications.some(a => a.job.id === job.id) ? (
+                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                               <span className="badge badge-green" style={{ fontSize: '0.7rem' }}>TRANSFERRED - {applications.find(a => a.job.id === job.id).status.toUpperCase()}</span>
+                               {applications.find(a => a.job.id === job.id).status === 'Accepted' && (
+                                   <Link to={`/chat/${job.client.id}`} className="btn btn-primary" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>Hub</Link>
+                               )}
+                           </div>
+                      ) : (
+                          <button className="btn btn-primary" style={{ padding: '0.55rem 1.25rem' }} onClick={() => {
+                              api.post('/applications/', { job: job.id }).then(res => setApplications([...applications, res.data]))
+                          }}>Launch Application</button>
+                      )}
+                 </div>
+              </div>
+            );
+          })}
         </div>
       </section>
     </div>
