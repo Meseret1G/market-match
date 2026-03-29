@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import axios from 'axios'
+import api from '../api'
 import { useNavigate, Link } from 'react-router-dom'
 
 export default function Register() {
@@ -15,7 +15,8 @@ export default function Register() {
       const is_freelancer = formData.role === 'freelancer'
       const is_client = formData.role === 'client'
       
-      await axios.post('http://localhost:8000/api/register/', {
+      // Sanitized hard-coded localhost for the dynamic API instance
+      await api.post('/register/', {
         username: formData.username,
         email: formData.email,
         password: formData.password,

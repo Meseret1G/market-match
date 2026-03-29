@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import axios from 'axios'
+import api from '../api'
 import { useNavigate, Link } from 'react-router-dom'
 
 export default function Login() {
@@ -11,7 +11,8 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault()
     try {
-      const res = await axios.post('http://localhost:8000/api/token/', { username, password })
+      // Replaced hard-coded localhost with the dynamic API instance
+      const res = await api.post('/token/', { username, password })
       localStorage.setItem('access_token', res.data.access)
       localStorage.setItem('refresh_token', res.data.refresh)
       
